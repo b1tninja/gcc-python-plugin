@@ -254,14 +254,18 @@ class PyTypeObject(NamedEntity):
         result += '    sizeof(%(struct_name)s), /*tp_basicsize*/\n' % self.__dict__
         result += '    0, /*tp_itemsize*/\n'
         result += self.c_ptr_field('tp_dealloc')
-        result += self.c_ptr_field('tp_print')
+        result += '#if PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION == 8\n' % self.__dict__
+        result += '    0, /*tp_vectorcall_offset*/\n'
+        result += '#else\n'
+        result += '    0, /*tp_print*/\n'
+        result += '#endif\n'
         result += self.c_ptr_field('tp_getattr')
         result += self.c_ptr_field('tp_setattr')
         result += '#if PY_MAJOR_VERSION < 3\n' % self.__dict__
-        result += '    0, /*tp_compare*/\n' % self.__dict__
-        result += '#else\n' % self.__dict__
-        result += '    0, /*reserved*/\n' % self.__dict__
-        result += '#endif\n' % self.__dict__
+        result += '    0, /*tp_compare*/\n'
+        result += '#else\n'
+        result += '    0, /*tp_async*/\n'
+        result += '#endif\n'
         result += self.c_ptr_field('tp_repr')
         result += self.c_ptr_field('tp_as_number')
         result += self.c_ptr_field('tp_as_sequence')
